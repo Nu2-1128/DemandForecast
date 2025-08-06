@@ -221,7 +221,7 @@ with tab2:
   else:
       st.warning("Could not load the necessary data to run the application.")
 
-with tab3
+with tab3:
   st.write("Welcome to the Product Forecast Result Application")
 
   st.markdown("For any questions or suggestions, please email: <a href='mailto:support@yourcompany.com'>support@yourcompany.com</a>", unsafe_allow_html=True)
