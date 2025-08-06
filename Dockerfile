@@ -2,7 +2,7 @@
 FROM python:3.10-slim
 
 # Expose the port that Streamlit will run on
-EXPOSE 8085
+EXPOSE 8080
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -18,4 +18,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Command to run your Streamlit application
-ENTRYPOINT ["streamlit", "run", "temperature.app.py", "--server.port=8085","--server.address=0.0.0.0"]
+ENTRYPOINT ["streamlit", "run", "temperature.app.py", "--server.port=8080","--server.address=0.0.0.0"]
