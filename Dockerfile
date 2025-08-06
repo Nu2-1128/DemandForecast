@@ -18,4 +18,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Command to run your Streamlit application
-ENTRYPOINT ["streamlit", "run", "temperature.app.py", "--server.port=8080","--server.address=0.0.0.0"]
+ENTRYPOINT ["streamlit", "run", "DemandForecast.app.py", "--server.port=8080","--server.address=0.0.0.0"]
