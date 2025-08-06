@@ -90,7 +90,9 @@ with tab1:
         kind='bar',
         sharey=False, # Allow different y-axis scales for different metrics
         height=6,
-        aspect=0.8
+        aspect=0.8,
+        # special setup for colorblind
+        palette='colorblind'
     )
 
     st.pyplot(g.fig)
@@ -204,7 +206,21 @@ with tab2:
       with Graph_container:
         if (selected_prod != ''):
           st.subheader('Time Series Analysis with forecast')
-          st.line_chart(combined_result[combined_result['Item'] == selected_prod], x='PDay',y='Value',color='Series_Type')
+          #st.line_chart(combined_result[combined_result['Item'] == selected_prod], x='PDay',y='Value',color='Series_Type')
+          # special setup for color blind
+          color_map = {'Actual': 'blue', 'ARIMA':'orange','ETS':'green','Holt_Winters':'red'}
+          fig = px.line(
+              combined_result[combined_result['Item'] == selected_prod], 
+              x='PDay', 
+              y='Value', 
+              color='Series_Type', 
+              markers=True,
+              line_dash='Series_Type',
+              color_discrete_map=color_map
+              )
+          fig.update_layout(
+              title=f'Time Series Analysis for {selected_prod}')
+          st.plotly_chart(fig, use_container_width=True)
       with ARIMA_container:
         if (selected_prod != ''):
           st.subheader('ARIMA Analysis')
