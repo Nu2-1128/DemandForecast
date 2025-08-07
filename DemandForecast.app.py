@@ -77,7 +77,7 @@ with tab1:
     st.write('Performance metrics analysis - Review RMSE, SMAPE, MAE and Duration between the three models:')
 
     st.write('RMSE - Root Mean Square Error. metrics the square root of the average of the squared differences between predicted and actual values. The lower the closer to the original value.')
-    st.write('SMAPE - Symmetric Mean Absolute Percentage Error. A percentage-based error metric that measures the accuracy of a forecast by taking the average of the absolute percentage eorros. A lower SMAPE value indicates a more accurate forecast.')
+    st.write('SMAPE - Symmetric Mean Absolute Percentage Error. A percentage-based error metric that measures the accuracy of a forecast by taking the average of the absolute percentage errors. A lower SMAPE value indicates a more accurate forecast.')
     st.write('MAE - Mean Absolute Error. A percentage-based error metric that measures the accuracy of a forecast by taking the average of the absolute differences between predicted and actual values. A lower MAE value indicates a more accurate forecast')
     st.write('Duration - Time (in seconds) for processing by the model')
 
@@ -210,10 +210,10 @@ with tab2:
           # special setup for color blind
           color_map = {'Actual': 'blue', 'ARIMA':'orange','ETS':'green','Holt_Winters':'red'}
           fig = px.line(
-              combined_result[combined_result['Item'] == selected_prod], 
-              x='PDay', 
-              y='Value', 
-              color='Series_Type', 
+              combined_result[combined_result['Item'] == selected_prod],
+              x='PDay',
+              y='Value',
+              color='Series_Type',
               markers=True,
               line_dash='Series_Type',
               color_discrete_map=color_map
@@ -245,7 +245,7 @@ with tab3:
   st.markdown("""
   Product Forecast Result is designed as a web-based applicaiton to allow users to review an exercise conducted by the company developer for evaluating different forecast algorithms.
 
-  It utilized the company customer demand data, with basic data cleaning include handling NAN value and OUtliers, forecast with the optimal parameters using Holt-Winters, ARIMA, and ETS algorithm.
+  It utilized the company customer demand data, with basic data cleaning include handling NAN value and Outliers, forecast with the optimal parameters using Holt-Winters, ARIMA, and ETS algorithm.
 
   This application serves with a summary analysis of the forecast result, and a page for user to select individual items to review each corresponding forecast performances.
 
