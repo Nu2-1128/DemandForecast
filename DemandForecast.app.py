@@ -238,9 +238,6 @@ with tab2:
       st.warning("Could not load the necessary data to run the application.")
 
 with tab3:
-  st.write("Welcome to the Product Forecast Result Application")
-
-  st.markdown("For any questions or suggestions, please email: <a href='mailto:support@yourcompany.com'>support@yourcompany.com</a>", unsafe_allow_html=True)
 
   st.markdown("""
   Product Forecast Result is designed as a web-based applicaiton to allow users to review an exercise conducted by the company developer for evaluating different forecast algorithms.
@@ -267,6 +264,6 @@ with tab3:
     - Holt Winters Analysis
 
   - **Help**
-    - Welcome to the Product Forecast Result Application
-    - For any questions or suggestions, please email: <a href='mailto:support@yourcompany.com'>support@yourcompany.com</a>
+    - Information about the application design concept and background
+    - Contact information
   """)
