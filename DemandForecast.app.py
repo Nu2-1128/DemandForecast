@@ -149,50 +149,52 @@ with tab1:
 
   # Initialization. For each Container to be used
   Metric_container = st.container(border = True)
+  RMSE_Container = st.container(border = True)
 
-  with Metric_container:
+  rmse_data = pd.DataFrame({
+    'ETS': ets_result['RMSE'],
+    'Holt-Winters': holt_winters_result['RMSE'],
+    'AutoARIMA': auto_arima_result['RMSE'],
+    'Hybrid': hybrid_result['RMSE'],
+    'Baseline': baseline_result['RMSE']
+  })
 
-    st.subheader('Forecast Model Summary')
-    st.write('Performance metrics analysis - Review RMSE, SMAPE, MAE and Duration between the three models:')
+  smape_data = pd.DataFrame({
+      'ETS': ets_result['SMAPE'],
+      'Holt-Winters': holt_winters_result['SMAPE'],
+      'AutoARIMA': auto_arima_result['SMAPE'],
+      'Hybrid': hybrid_result['SMAPE'],
+      'Baseline': baseline_result['SMAPE']
+  })
 
-    rmse_data = pd.DataFrame({
-      'ETS': ets_result['RMSE'],
-      'Holt-Winters': holt_winters_result['RMSE'],
-      'AutoARIMA': auto_arima_result['RMSE'],
-      'Hybrid': hybrid_result['RMSE'],
-      'Baseline': baseline_result['RMSE']
-    })
+  mae_data = pd.DataFrame({
+      'ETS': ets_result['MAE'],
+      'Holt-Winters': holt_winters_result['MAE'],
+      'AutoARIMA': auto_arima_result['MAE'],
+      'Hybrid': hybrid_result['MAE'],
+      'Baseline': baseline_result['MAE']
+  })
 
-    smape_data = pd.DataFrame({
-        'ETS': ets_result['SMAPE'],
-        'Holt-Winters': holt_winters_result['SMAPE'],
-        'AutoARIMA': auto_arima_result['SMAPE'],
-        'Hybrid': hybrid_result['SMAPE'],
-        'Baseline': baseline_result['SMAPE']
-    })
+  duration_data = pd.DataFrame({
+      'ETS': ets_result['Duration'],
+      'Holt-Winters': holt_winters_result['Duration'],
+      'AutoARIMA': auto_arima_result['Duration'],
+      'Hybrid': hybrid_result['Duration'],
+      'Baseline': baseline_result['Duration']
+  })
 
-    mae_data = pd.DataFrame({
-        'ETS': ets_result['MAE'],
-        'Holt-Winters': holt_winters_result['MAE'],
-        'AutoARIMA': auto_arima_result['MAE'],
-        'Hybrid': hybrid_result['MAE'],
-        'Baseline': baseline_result['MAE']
-    })
+  if rmse_data.empty or smape_data.empty or mae_data.empty or duration_data.empty:
+    st.warning("⚠️ One or more of the metric dataframes is empty. Cannot generate plots.")
+    st.info("Please ensure your data files are not empty and are loaded correctly.")
+  else:
 
-    duration_data = pd.DataFrame({
-        'ETS': ets_result['Duration'],
-        'Holt-Winters': holt_winters_result['Duration'],
-        'AutoARIMA': auto_arima_result['Duration'],
-        'Hybrid': hybrid_result['Duration'],
-        'Baseline': baseline_result['Duration']
-    })
+    with Metric_container:
 
-    if rmse_data.empty or smape_data.empty or mae_data.empty or duration_data.empty:
-        st.warning("⚠️ One or more of the metric dataframes is empty. Cannot generate plots.")
-        st.info("Please ensure your data files are not empty and are loaded correctly.")
-    else:
+      st.subheader('Forecast Model Summary')
+      st.write('Performance metrics analysis - Review RMSE, SMAPE, MAE and Duration between the three models:')
+
       # Create subplots for box plots for all four metrics
-      fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+      fig, axes = plt.subplots(2, 2, figsize=(12, 8))
       fig.suptitle('Comparison of Model Metrics', fontsize=16)
 
       # Box plot for RMSE
@@ -228,131 +230,33 @@ with tab1:
 
       st.pyplot(fig)  
 
-"""
-  # Check if data was loaded successfully before proceeding
-  if not melted_performance_analysis.empty:
-    performance_metrics_df = melted_performance_analysis[melted_performance_analysis['Metric_Type'].isin(['RMSE','SMAPE','MAE','Duration'].copy())]
+    with RMSE_Container:
 
-    performance_metrics_df['Trend & Seasonality'] = performance_metrics_df.apply(
-        lambda row: f"Trend: {row['has_trend']}, Seasonality: {row['has_seasonality']}", axis=1
-    )
+      st.subheader('Combined RMSE Distribution')
+      st.write('Combined display of the RMSE distribution for all models')
 
-    # Initialization. Each container include a collection of visualization to be displayed
-    Metric_container = st.container(border = True)
-    HW_result_Container = st.container(border = True)
-    ARIMA_result_Container = st.container(border = True)
-    ETS_result_Container = st.container(border = True)
+      # Determine global x-limits for a consistent view across histograms
+      global_rmse_min = rmse_data.min().min()
+      global_rmse_max = rmse_data.max().max()
 
-    with Metric_container:
-      st.subheader('Forecast Model Summary')
-      st.write('Performance metrics analysis - Review RMSE, SMAPE, MAE and Duration between the three models:')
+      # Create the figure for the histogram
+      fig_hist, ax_hist = plt.subplots(figsize=(12, 7))
 
-      st.write('RMSE - Root Mean Square Error. metrics the square root of the average of the squared differences between predicted and actual values. The lower the closer to the original value.')
-      st.write('SMAPE - Symmetric Mean Absolute Percentage Error. A percentage-based error metric that measures the accuracy of a forecast by taking the average of the absolute percentage errors. A lower SMAPE value indicates a more accurate forecast.')
-      st.write('MAE - Mean Absolute Error. A percentage-based error metric that measures the accuracy of a forecast by taking the average of the absolute differences between predicted and actual values. A lower MAE value indicates a more accurate forecast')
-      st.write('Duration - Time (in seconds) for processing by the model')
+      # Plot overlaid histograms for each model's RMSE
+      colors = {'ETS': 'skyblue', 'Holt-Winters': 'lightcoral', 'AutoARIMA': 'lightgreen', 'Hybrid': 'gold', 'Baseline': 'purple'}
+      for model in rmse_data.columns:
+          ax_hist.hist(rmse_data[model], bins=20, density=True, alpha=0.75, label=model, color=colors.get(model, 'gray'))
 
-      g = sns.catplot(
-          data=performance_metrics_df,
-          x='Model',
-          y='Value',
-          hue='Trend & Seasonality',
-          col='Metric_Type',
-          kind='bar',
-          sharey=False, # Allow different y-axis scales for different metrics
-          height=6,
-          aspect=0.8,
-          # special setup for colorblind
-          palette='colorblind'
-      )
+      ax_hist.set_title('Combined RMSE Distribution of Forecasting Models')
+      ax_hist.set_xlabel('RMSE')
+      ax_hist.set_ylabel('Density')
+      ax_hist.set_xlim([global_rmse_min, global_rmse_max])
+      ax_hist.legend()
+      ax_hist.grid(axis='y', linestyle='--', alpha=0.75)
 
-      st.pyplot(g.fig)
+      plt.tight_layout()
+      st.pyplot(fig_hist)
 
-    # Check if data was loaded successfully before proceeding
-    if not holt_winter_result.empty:
-        with HW_result_Container:
-          st.subheader('Holt Winters Analysis')
-
-          col1, col2, col3, col4 = st.columns(4)
-
-          with col1:
-            plt.figure()
-            st.write('Distribution of RMSE (HW)')
-            sns.histplot(holt_winter_result['RMSE'], kde=True, bins=10)
-            st.pyplot(plt, use_container_width=True)
-          with col2:
-            plt.figure()
-            st.write('Distribution of SMAPE (HW)')
-            sns.histplot(holt_winter_result['SMAPE'], kde=True, bins=10)
-            st.pyplot(plt, use_container_width=True)
-          with col3:
-            plt.figure()
-            st.write('Distribution of MAE (HW)')
-            sns.histplot(holt_winter_result['MAE'], kde=True, bins=10)
-            st.pyplot(plt, use_container_width=True)
-          with col4:
-            plt.figure()
-            st.write('Distribution of Duration (HW)')
-            sns.histplot(holt_winter_result['Duration'], kde=True, bins=10)
-            st.pyplot(plt, use_container_width=True)
-
-    # Check if data was loaded successfully before proceeding
-    if not arima_result.empty:
-        with ARIMA_result_Container:
-          st.subheader('ARIMA Analysis')
-
-          col1, col2, col3, col4 = st.columns(4)
-
-          with col1:
-            plt.figure()
-            st.write('Distribution of RMSE (ARIMA)')
-            sns.histplot(arima_result['RMSE'], kde=True, bins=10)
-            st.pyplot(plt, use_container_width=True)
-          with col2:
-            plt.figure()
-            st.write('Distribution of SMAPE (ARIMA)')
-            sns.histplot(arima_result['SMAPE'], kde=True, bins=10)
-            st.pyplot(plt, use_container_width=True)
-          with col3:
-            plt.figure()
-            st.write('Distribution of MAE (ARIMA)')
-            sns.histplot(arima_result['MAE'], kde=True, bins=10)
-            st.pyplot(plt, use_container_width=True)
-          with col4:
-            plt.figure()
-            st.write('Distribution of Duration (ARIMA)')
-            sns.histplot(arima_result['Duration'], kde=True, bins=10)
-            st.pyplot(plt, use_container_width=True)
-
-    # Check if data was loaded successfully before proceeding
-    if not ets_result.empty:
-        with ETS_result_Container:
-          st.subheader('ETS Analysis')
-
-          col1, col2, col3, col4 = st.columns(4)
-          with col1:
-            plt.figure()
-            st.write('Distribution of RMSE (ETS)')
-            sns.histplot(ets_result['RMSE'], kde=True, bins=10)
-            st.pyplot(plt, use_container_width=True)
-          with col2:
-            plt.figure()
-            st.write('Distribution of SMAPE (ETS)')
-            sns.histplot(ets_result['SMAPE'], kde=True, bins=10)
-            st.pyplot(plt, use_container_width=True)
-          with col3:
-            plt.figure()
-            st.write('Distribution of MAE (ETS)')
-            sns.histplot(ets_result['MAE'], kde=True, bins=10)
-            st.pyplot(plt, use_container_width=True)
-          with col4:
-            plt.figure()
-            st.write('Distribution of Duration (ETS)')
-            sns.histplot(ets_result['Duration'], kde=True, bins=10)
-            st.pyplot(plt, use_container_width=True)
-
-  else:
-      st.warning("Could not load the necessary data for the Forecast Model Summary tab.")
 
 """
 with tab2:
