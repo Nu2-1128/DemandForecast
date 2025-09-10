@@ -145,13 +145,13 @@ tab1, tab2, tab3 = st.tabs(tab_titles)
 
 with tab1:
 
-st.subheader("Algorithm summary")
+  st.subheader("Algorithm summary")
 
-st.write('Auto ARIMA:')
-st.dataframe(auto_arima_result)
+  st.write('Auto ARIMA:')
+  st.dataframe(auto_arima_result)
 
-st.write('BASELINE:')
-st.dataframe(baseline_result)
+  st.write('BASELINE:')
+  st.dataframe(baseline_result)
 
 """
   # Check if data was loaded successfully before proceeding
