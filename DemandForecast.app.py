@@ -151,6 +151,10 @@ with tab1:
   Metric_container = st.container(border = True)
 
   with Metric_container:
+
+    st.subheader('Forecast Model Summary')
+    st.write('Performance metrics analysis - Review RMSE, SMAPE, MAE and Duration between the three models:')
+
     rmse_data = pd.DataFrame({
       'ETS': ets_result['RMSE'],
       'Holt-Winters': holt_winters_result['RMSE'],
@@ -183,36 +187,46 @@ with tab1:
         'Baseline': baseline_result['Duration']
     })
 
-    # Create subplots for box plots for all four metrics
-    fig, axes = plt.subplots(2, 2, figsize=(12, 10)) # Adjusted layout for 4 plots
+    if rmse_data.empty or smape_data.empty or mae_data.empty or duration_data.empty:
+        st.warning("⚠️ One or more of the metric dataframes is empty. Cannot generate plots.")
+        st.info("Please ensure your data files are not empty and are loaded correctly.")
+    else:
+      # Create subplots for box plots for all four metrics
+      fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+      fig.suptitle('Comparison of Model Metrics', fontsize=16)
 
-    # Box plot for RMSE
-    sns.boxplot(data=rmse_data, ax=axes[0, 0])
-    axes[0, 0].set_title('RMSE Distribution by Model')
-    axes[0, 0].set_ylabel('RMSE')
-    axes[0, 0].grid(axis='y', alpha=0.75)
+      # Box plot for RMSE
+      sns.boxplot(data=rmse_data, ax=axes[0, 0], palette="viridis")
+      axes[0, 0].set_title('RMSE Distribution by Model')
+      axes[0, 0].set_ylabel('RMSE')
+      axes[0, 0].grid(axis='y', linestyle='--', alpha=0.7)
+      axes[0, 0].tick_params(axis='x', rotation=15)
 
-    # Box plot for SMAPE
-    sns.boxplot(data=smape_data, ax=axes[0, 1])
-    axes[0, 1].set_title('SMAPE Distribution by Model')
-    axes[0, 1].set_ylabel('SMAPE')
-    axes[0, 1].grid(axis='y', alpha=0.75)
 
-    # Box plot for MAE
-    sns.boxplot(data=mae_data, ax=axes[1, 0])
-    axes[1, 0].set_title('MAE Distribution by Model')
-    axes[1, 0].set_ylabel('MAE')
-    axes[1, 0].grid(axis='y', alpha=0.75)
+      # Box plot for SMAPE
+      sns.boxplot(data=smape_data, ax=axes[0, 1], palette="plasma")
+      axes[0, 1].set_title('SMAPE Distribution by Model')
+      axes[0, 1].set_ylabel('SMAPE')
+      axes[0, 1].grid(axis='y', linestyle='--', alpha=0.7)
+      axes[0, 1].tick_params(axis='x', rotation=15)
 
-    # Box plot for Duration
-    sns.boxplot(data=duration_data, ax=axes[1, 1])
-    axes[1, 1].set_title('Training Duration by Model')
-    axes[1, 1].set_ylabel('Duration (seconds)')
-    axes[1, 1].grid(axis='y', alpha=0.75)
+      # Box plot for MAE
+      sns.boxplot(data=mae_data, ax=axes[1, 0], palette="magma")
+      axes[1, 0].set_title('MAE Distribution by Model')
+      axes[1, 0].set_ylabel('MAE')
+      axes[1, 0].grid(axis='y', linestyle='--', alpha=0.7)
+      axes[1, 0].tick_params(axis='x', rotation=15)
 
-    plt.tight_layout()
-    plt.show()
+      # Box plot for Duration
+      sns.boxplot(data=duration_data, ax=axes[1, 1], palette="cividis")
+      axes[1, 1].set_title('Training Duration by Model')
+      axes[1, 1].set_ylabel('Duration (seconds)')
+      axes[1, 1].grid(axis='y', linestyle='--', alpha=0.7)
+      axes[1, 1].tick_params(axis='x', rotation=15)
 
+      plt.tight_layout(rect=[0, 0.03, 1, 0.95]) # Adjust layout to prevent title overlap
+
+      st.pyplot(fig)  
 
 """
   # Check if data was loaded successfully before proceeding
