@@ -258,7 +258,7 @@ with tab1:
       st.pyplot(fig_hist)
 
 
-"""
+
 with tab2:
 
   st.subheader('Individual Items Forecast')
