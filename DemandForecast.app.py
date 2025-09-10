@@ -39,7 +39,7 @@ public_csv_ids ={
     'auto_arima_results': '1S7CqfAH_lnKcMb_FIVXfAApdDPE9a1O2',
     'baseline_results': '1_OyODMabWzq92J5G6VLmrxldN4wRjQwA',
     'combined_forecasts_df': '16Ak2oVyUemlexY1EEkshzbO_2bs5Nl8D',
-    'comany_data_treated': '1cJHUNHx6rxocFMmIXgGGI3jjEVg50dSq',
+    'company_data_treated': '1cJHUNHx6rxocFMmIXgGGI3jjEVg50dSq',
     'company_data': '1bHd4Rc3t6lPLM2OY931RoTJmMHQF-Hmu',
     'ets_results': '1hk1unwWuPYwhjLH6dDvyPd5wUxLvi_rJ', 
     'holt_winters_results': '1XIoeToA9JaPg_Z8Fo5i2d17DF0R3nBcK',
@@ -122,7 +122,7 @@ combined_result = get_DataFrame_from_File('combined_forecasts_df')
 company_data_treated = get_DataFrame_from_File('company_data_treated')
 company_data = get_DataFrame_from_File('company_data')
 ets_result = get_DataFrame_from_File('ets_results')
-holt_winter_result = get_DataFrame_from_File('holt_winters_results')
+holt_winters_result = get_DataFrame_from_File('holt_winters_results')
 hybrid_result = get_DataFrame_from_File('hybrid_df')
 selected_items_df = get_DataFrame_from_File('selected_items_df')
 shap_values_result = get_DataFrame_from_File('shap_values_df')
@@ -147,11 +147,72 @@ with tab1:
 
   st.subheader("Algorithm summary")
 
-  st.write('Auto ARIMA:')
-  st.dataframe(auto_arima_result)
+  # Initialization. For each Container to be used
+  Metric_container = st.container(border = True)
 
-  st.write('BASELINE:')
-  st.dataframe(baseline_result)
+  with Metric_container:
+    rmse_data = pd.DataFrame({
+      'ETS': ets_result['RMSE'],
+      'Holt-Winters': holt_winters_result['RMSE'],
+      'AutoARIMA': auto_arima_result['RMSE'],
+      'Hybrid': hybrid_result['RMSE'],
+      'Baseline': baseline_result['RMSE']
+    })
+
+    smape_data = pd.DataFrame({
+        'ETS': ets_result['SMAPE'],
+        'Holt-Winters': holt_winters_result['SMAPE'],
+        'AutoARIMA': auto_arima_result['SMAPE'],
+        'Hybrid': hybrid_result['SMAPE'],
+        'Baseline': baseline_result['SMAPE']
+    })
+
+    mae_data = pd.DataFrame({
+        'ETS': ets_result['MAE'],
+        'Holt-Winters': holt_winters_result['MAE'],
+        'AutoARIMA': auto_arima_result['MAE'],
+        'Hybrid': hybrid_result['MAE'],
+        'Baseline': baseline_result['MAE']
+    })
+
+    duration_data = pd.DataFrame({
+        'ETS': ets_result['Duration'],
+        'Holt-Winters': holt_winters_result['Duration'],
+        'AutoARIMA': auto_arima_result['Duration'],
+        'Hybrid': hybrid_result['Duration'],
+        'Baseline': baseline_result['Duration']
+    })
+
+    # Create subplots for box plots for all four metrics
+    fig, axes = plt.subplots(2, 2, figsize=(12, 10)) # Adjusted layout for 4 plots
+
+    # Box plot for RMSE
+    sns.boxplot(data=rmse_data, ax=axes[0, 0])
+    axes[0, 0].set_title('RMSE Distribution by Model')
+    axes[0, 0].set_ylabel('RMSE')
+    axes[0, 0].grid(axis='y', alpha=0.75)
+
+    # Box plot for SMAPE
+    sns.boxplot(data=smape_data, ax=axes[0, 1])
+    axes[0, 1].set_title('SMAPE Distribution by Model')
+    axes[0, 1].set_ylabel('SMAPE')
+    axes[0, 1].grid(axis='y', alpha=0.75)
+
+    # Box plot for MAE
+    sns.boxplot(data=mae_data, ax=axes[1, 0])
+    axes[1, 0].set_title('MAE Distribution by Model')
+    axes[1, 0].set_ylabel('MAE')
+    axes[1, 0].grid(axis='y', alpha=0.75)
+
+    # Box plot for Duration
+    sns.boxplot(data=duration_data, ax=axes[1, 1])
+    axes[1, 1].set_title('Training Duration by Model')
+    axes[1, 1].set_ylabel('Duration (seconds)')
+    axes[1, 1].grid(axis='y', alpha=0.75)
+
+    plt.tight_layout()
+    plt.show()
+
 
 """
   # Check if data was loaded successfully before proceeding
