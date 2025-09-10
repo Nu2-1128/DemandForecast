@@ -25,25 +25,40 @@ st.markdown("For any questions or suggestions, please email: <a href='mailto:sup
 # Hardcode of each file ilnks shared by developer;
 # To be removed once the application is successfully hosted in Google Cloud.
 
-public_csv_urls ={
-  'time_series_analysis': 'https://drive.google.com/uc?export=download&id=1TabpcT7O-E69WDwwbAFuAWLYohAiEH1x',
-  'holt_winters': 'https://drive.google.com/uc?export=download&id=12_xlfN6ckXbLFi-tgfQVfwUSjnhJ0TQo',
-  'arima': 'https://drive.google.com/uc?export=download&id=1dmwzPFdsk_Y-i3Ar_IelmFduv1DTGAcM',
-  'ets': '1IANN4BZ4ehn5x3-XnmaWFSpL_Xg3FxKi',
-  'combined': '1lK2--bL7k_wV7idEiD7EaPF1wDJ66EV6',
-  'melted_performance': '1h0BWiat2yqe_WslgJ2xhezKRePNNOalD',
-  'merged_performance': '1T9to_5P-0fskcW1x3AQVTt0qQ8bCfJIR'
-}
+#public_csv_urls ={
+#  'time_series_analysis': 'https://drive.google.com/uc?export=download&id=1TabpcT7O-E69WDwwbAFuAWLYohAiEH1x',
+#  'holt_winters': 'https://drive.google.com/uc?export=download&id=12_xlfN6ckXbLFi-tgfQVfwUSjnhJ0TQo',
+#  'arima': 'https://drive.google.com/uc?export=download&id=1dmwzPFdsk_Y-i3Ar_IelmFduv1DTGAcM',
+#  'ets': '1IANN4BZ4ehn5x3-XnmaWFSpL_Xg3FxKi',
+#  'combined': '1lK2--bL7k_wV7idEiD7EaPF1wDJ66EV6',
+#  'melted_performance': '1h0BWiat2yqe_WslgJ2xhezKRePNNOalD',
+#  'merged_performance': '1T9to_5P-0fskcW1x3AQVTt0qQ8bCfJIR'
+#}
 
 public_csv_ids ={
-  'time_series_analysis': '1TabpcT7O-E69WDwwbAFuAWLYohAiEH1x',
-  'holt_winters': '12_xlfN6ckXbLFi-tgfQVfwUSjnhJ0TQo',
-  'arima': '1dmwzPFdsk_Y-i3Ar_IelmFduv1DTGAcM',
-  'ets': '1IANN4BZ4ehn5x3-XnmaWFSpL_Xg3FxKi',
-  'combined': '1lK2--bL7k_wV7idEiD7EaPF1wDJ66EV6',
-  'melted_performance': '1h0BWiat2yqe_WslgJ2xhezKRePNNOalD',
-  'merged_performance': '1T9to_5P-0fskcW1x3AQVTt0qQ8bCfJIR'
+    'auto_arima_results': '1S7CqfAH_lnKcMb_FIVXfAApdDPE9a1O2',
+    'baseline_results': '1_OyODMabWzq92J5G6VLmrxldN4wRjQwA',
+    'combined_forecasts_df': '16Ak2oVyUemlexY1EEkshzbO_2bs5Nl8D',
+    'comany_data_treated': '1cJHUNHx6rxocFMmIXgGGI3jjEVg50dSq',
+    'company_data': '1bHd4Rc3t6lPLM2OY931RoTJmMHQF-Hmu',
+    'ets_results': '1hk1unwWuPYwhjLH6dDvyPd5wUxLvi_rJ', 
+    'holt_winters_results': '1XIoeToA9JaPg_Z8Fo5i2d17DF0R3nBcK',
+    'hybrid_df': '1J2YUWbCsBwi-POwdDqu7CId8Zpf2E6ST',
+    'selected_items_df': '10rumhJAe93ThQxgpLPEY6Y1SsD_yy7G3',
+    'shap_values_df': '10xbgC0M3iNDUEnfbyxQaa32aOiQ8OR95',
+    'time_series_analysis_df': '1whpsUs-3ULPsg8WnlT1vMBvL99uTtHZo',
+    'truncated_company_data': '1cFkzpSSqAeb81mYusNSHWtgPBWzBo67E'
 }
+                 
+
+#  'time_series_analysis': '1TabpcT7O-E69WDwwbAFuAWLYohAiEH1x',
+#  'holt_winters': '12_xlfN6ckXbLFi-tgfQVfwUSjnhJ0TQo',
+#  'arima': '1dmwzPFdsk_Y-i3Ar_IelmFduv1DTGAcM',
+#  'ets': '1IANN4BZ4ehn5x3-XnmaWFSpL_Xg3FxKi',
+#  'combined': '1lK2--bL7k_wV7idEiD7EaPF1wDJ66EV6',
+#  'melted_performance': '1h0BWiat2yqe_WslgJ2xhezKRePNNOalD',
+#  'merged_performance': '1T9to_5P-0fskcW1x3AQVTt0qQ8bCfJIR'
+
 
 # Function to download file from Google Drive
 def download_file(file_key):
@@ -100,13 +115,27 @@ st.set_page_config(layout="wide")
 
 # Load the data needed for the app
 # Use get_DataFrame_from_File for reading from downloaded files
-time_series_analysis_result = get_DataFrame_from_File('time_series_analysis')
-holt_winter_result = get_DataFrame_from_File('holt_winters')
-arima_result = get_DataFrame_from_File('arima')
-ets_result = get_DataFrame_from_File('ets')
-combined_result = get_DataFrame_from_File('combined')
-melted_performance_analysis = get_DataFrame_from_File('melted_performance')
-merged_performance_analysis = get_DataFrame_from_File('merged_performance')
+
+auto_arima_result = get_DataFrame_from_File('auto_arima_results')
+baseline_result = get_DataFrame_from_File('baseline_results')
+combined_result = get_DataFrame_from_File('combined_forecasts_df')
+company_data_treated = get_DataFrame_from_File('company_data_treated')
+company_data = get_DataFrame_from_File('company_data')
+ets_result = get_DataFrame_from_File('ets_results')
+holt_winter_result = get_DataFrame_from_File('holt_winters_results')
+hybrid_result = get_DataFrame_from_File('hybrid_df')
+selected_items_df = get_DataFrame_from_File('selected_items_df')
+shap_values_result = get_DataFrame_from_File('shap_values_df')
+time_series_analysis_result = get_DataFrame_from_File('time_series_analysis_df')
+truncated_company_data = get_DataFrame_from_File('truncated_company_data')
+
+#time_series_analysis_result = get_DataFrame_from_File('time_series_analysis')
+#holt_winter_result = get_DataFrame_from_File('holt_winters')
+#arima_result = get_DataFrame_from_File('arima')
+#ets_result = get_DataFrame_from_File('ets')
+#combined_result = get_DataFrame_from_File('combined')
+#melted_performance_analysis = get_DataFrame_from_File('melted_performance')
+#merged_performance_analysis = get_DataFrame_from_File('merged_performance')
 
 
 # setup tabs name
@@ -116,6 +145,9 @@ tab1, tab2, tab3 = st.tabs(tab_titles)
 
 with tab1:
 
+st.subheader("Algorithm summary")
+
+"""
   # Check if data was loaded successfully before proceeding
   if not melted_performance_analysis.empty:
     performance_metrics_df = melted_performance_analysis[melted_performance_analysis['Metric_Type'].isin(['RMSE','SMAPE','MAE','Duration'].copy())]
@@ -241,10 +273,12 @@ with tab1:
   else:
       st.warning("Could not load the necessary data for the Forecast Model Summary tab.")
 
-
+"""
 with tab2:
 
   st.subheader('Individual Items Forecast')
+
+"""
   # Check if data was loaded successfully before proceeding
   if not time_series_analysis_result.empty and not merged_performance_analysis.empty and not combined_result.empty and not arima_result.empty and not ets_result.empty and not holt_winter_result.empty:
 
@@ -334,4 +368,6 @@ with tab3:
   - **Help**
     - Information about the application design concept and background
     - Contact information
+    - About the developer
+      - Project is created and design by Andy Tang for education use.
   """)
