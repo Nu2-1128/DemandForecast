@@ -147,6 +147,12 @@ with tab1:
 
 st.subheader("Algorithm summary")
 
+st.write('Auto ARIMA:')
+st.dataframe(auto_arima_result)
+
+st.write('BASELINE:')
+st.dataframe(baseline_result)
+
 """
   # Check if data was loaded successfully before proceeding
   if not melted_performance_analysis.empty:
@@ -338,6 +344,7 @@ with tab2:
 
   else:
       st.warning("Could not load the necessary data to run the application.")
+"""
 
 with tab3:
 
