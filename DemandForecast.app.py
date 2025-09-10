@@ -240,9 +240,12 @@ with tab2:
       # Initialize container
       Stat_container = st.container(border=True)
       Graph_container = st.container(border=True)
+      BASELINE_Container = st.container(border=True)
       ARIMA_container = st.container(border=True)
       ETS_container = st.container(border=True)
       HW_Container = st.container(border=True)
+      HYBRID_Container = st.container(border=True)
+      
 
       with Stat_container:
         if (selected_prod != ''):
@@ -267,6 +270,10 @@ with tab2:
           fig.update_layout(
               title=f'Time Series Analysis for {selected_prod}')
           st.plotly_chart(fig, use_container_width=True)
+      with BASELINE_Container:
+        if (selected_prod != ''):
+          st.subheader('Baseline Analysis')
+          st.write(baseline_result[baseline_result['Item'] == selected_prod])
       with ARIMA_container:
         if (selected_prod != ''):
           st.subheader('ARIMA Analysis')
@@ -279,6 +286,10 @@ with tab2:
         if (selected_prod != ''):
           st.subheader('Holt Winters Analysis')
           st.write(holt_winters_result[holt_winters_result['Item'] == selected_prod])
+      with HYBRID_Container:
+        if (selected_prod != ''):
+          st.subheader('Hybrid Analysis')
+          st.write(hybrid_result[hybrid_result['Item'] == selected_prod])
 
   else:
       st.warning("Could not load the necessary data to run the application.")
@@ -288,7 +299,7 @@ with tab3:
   st.markdown("""
   Product Forecast Result is designed as a web-based applicaiton to allow users to review an exercise conducted by the company developer for evaluating different forecast algorithms.
 
-  It utilized the company customer demand data, with basic data cleaning include handling NAN value and Outliers, forecast with the optimal parameters using Holt-Winters, ARIMA, and ETS algorithm.
+  It utilized the company customer demand data, with basic data cleaning include handling NAN value and Outliers, forecast with the optimal parameters using Holt-Winters, ARIMA, ETS, Hybrid approach of ARIMA+XGBoost, and a baseline algorithm.
 
   This application serves with a summary analysis of the forecast result, and a page for user to select individual items to review each corresponding forecast performances.
 
