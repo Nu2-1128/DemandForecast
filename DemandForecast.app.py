@@ -28,15 +28,15 @@ public_csv_ids ={
     'combined_forecasts_df': '16Ak2oVyUemlexY1EEkshzbO_2bs5Nl8D',
     'company_data_treated': '1cJHUNHx6rxocFMmIXgGGI3jjEVg50dSq',
     'company_data': '1bHd4Rc3t6lPLM2OY931RoTJmMHQF-Hmu',
-    'ets_results': '1hk1unwWuPYwhjLH6dDvyPd5wUxLvi_rJ', 
+    'ets_results': '1hk1unwWuPYwhjLH6dDvyPd5wUxLvi_rJ',
     'holt_winters_results': '1XIoeToA9JaPg_Z8Fo5i2d17DF0R3nBcK',
-    'hybrid_df': '1J2YUWbCsBwi-POwdDqu7CId8Zpf2E6ST',
+    'hybrid_df': '1J2YUWbCsBwi-POwdDqu7CId8Zpf2E6ST', 
     'selected_items_df': '10rumhJAe93ThQxgpLPEY6Y1SsD_yy7G3',
     'shap_values_df': '10xbgC0M3iNDUEnfbyxQaa32aOiQ8OR95',
     'time_series_analysis_df': '1whpsUs-3ULPsg8WnlT1vMBvL99uTtHZo',
     'truncated_company_data': '1cFkzpSSqAeb81mYusNSHWtgPBWzBo67E'
 }
-                 
+
 # Function to download file from Google Drive
 def download_file(file_key):
   # Try to load credentials from environment variable or default
@@ -195,7 +195,7 @@ with tab1:
 
       plt.tight_layout(rect=[0, 0.03, 1, 0.95]) # Adjust layout to prevent title overlap
 
-      st.pyplot(fig)  
+      st.pyplot(fig)
 
     with RMSE_Container:
 
@@ -245,7 +245,7 @@ with tab2:
       ETS_container = st.container(border=True)
       HW_Container = st.container(border=True)
       HYBRID_Container = st.container(border=True)
-      
+
 
       with Stat_container:
         if (selected_prod != ''):
@@ -290,6 +290,27 @@ with tab2:
         if (selected_prod != ''):
           st.subheader('Hybrid Analysis')
           st.write(hybrid_result[hybrid_result['Item'] == selected_prod])
+
+      # Add download button
+      if selected_prod != '':
+        # Combine all dataframes for the selected product into a single dataframe for download
+        download_df = pd.concat([
+            time_series_analysis_result[time_series_analysis_result['Item'] == selected_prod].assign(Source='TimeSeriesAnalysis'),
+            combined_result[combined_result['Item'] == selected_prod].assign(Source='CombinedForecasts'),
+            baseline_result[baseline_result['Item'] == selected_prod].assign(Source='Baseline'),
+            auto_arima_result[auto_arima_result['Item'] == selected_prod].assign(Source='ARIMA'),
+            ets_result[ets_result['Item'] == selected_prod].assign(Source='ETS'),
+            holt_winters_result[holt_winters_result['Item'] == selected_prod].assign(Source='HoltWinters'),
+            hybrid_result[hybrid_result['Item'] == selected_prod].assign(Source='Hybrid')
+        ], ignore_index=True)
+
+        csv = download_df.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="Download Data for Selected Item as CSV",
+            data=csv,
+            file_name=f'{selected_prod}_forecast_data.csv',
+            mime='text/csv',
+        )
 
   else:
       st.warning("Could not load the necessary data to run the application.")
