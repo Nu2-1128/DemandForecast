@@ -109,6 +109,7 @@ time_series_analysis_result = get_DataFrame_from_File('time_series_analysis_df')
 truncated_company_data = get_DataFrame_from_File('truncated_company_data')
 best_model = get_DataFrame_from_File('best_model')
 
+
 # setup tabs name
 tab_titles = ['Forecast Model Summary','Individual Items Forecast','Help']
 
@@ -221,46 +222,54 @@ with tab1:
 
       plt.tight_layout()
       st.pyplot(fig_best)
-    
+
     with SHAP_container:
 
       st.subheader('SHAP for XGBoost process')
       st.write('For the Hybrid model - XGBoost process, to evalulate each factor effectiveness as a predictor')
 
-      feature_names = ['month', 'year', 'lag_1_qty', 'rolling_3m_avg_qty', 'Promo']
-      shap_values = shap_values_result[feature_names].values
-      X_values = shap_values_result[feature_names]
+      if not shap_values_result.empty:
+          feature_names = ['month', 'year', 'lag_1_qty', 'rolling_3m_avg_qty', 'Promo']
+          shap_values = shap_values_result[feature_names].values
+          X_values = shap_values_result[feature_names]
 
-      fig_shap, ax_shap = plt.subplots()
-      shap.summary_plot(shap_values, X_values , feature_names=feature_names)
-      st.pyplot(fig_shap)
+          fig_shap, ax_shap = plt.subplots()
+          shap.summary_plot(shap_values, X_values , feature_names=feature_names)
+          st.pyplot(fig_shap)
+      else:
+          st.warning("⚠️ SHAP values data is empty. Cannot generate SHAP summary plot.")
+
 
     with RMSE_Container:
 
       st.subheader('Combined RMSE Distribution')
       st.write('Combined display of the RMSE distribution for all models')
 
-      # Determine global x-limits for a consistent view across histograms
-      global_rmse_min = rmse_data.min().min()
-      global_rmse_max = rmse_data.max().max()
+      if not rmse_data.empty:
+          # Determine global x-limits for a consistent view across histograms
+          global_rmse_min = rmse_data.min().min()
+          global_rmse_max = rmse_data.max().max()
 
-      # Create the figure for the histogram
-      fig_hist, ax_hist = plt.subplots(figsize=(12, 7))
+          # Create the figure for the histogram
+          fig_hist, ax_hist = plt.subplots(figsize=(12, 7))
 
-      # Plot overlaid histograms for each model's RMSE
-      colors = {'ETS': 'skyblue', 'Holt-Winters': 'lightcoral', 'AutoARIMA': 'lightgreen', 'Hybrid': 'gold', 'Baseline': 'purple'}
-      for model in rmse_data.columns:
-          ax_hist.hist(rmse_data[model], bins=20, density=True, alpha=0.75, label=model, color=colors.get(model, 'gray'))
+          # Plot overlaid histograms for each model's RMSE
+          colors = {'ETS': 'skyblue', 'Holt-Winters': 'lightcoral', 'AutoARIMA': 'lightgreen', 'Hybrid': 'gold', 'Baseline': 'purple'}
+          for model in rmse_data.columns:
+              ax_hist.hist(rmse_data[model], bins=20, density=True, alpha=0.75, label=model, color=colors.get(model, 'gray'))
 
-      ax_hist.set_title('Combined RMSE Distribution of Forecasting Models')
-      ax_hist.set_xlabel('RMSE')
-      ax_hist.set_ylabel('Density')
-      ax_hist.set_xlim([global_rmse_min, global_rmse_max])
-      ax_hist.legend()
-      ax_hist.grid(axis='y', linestyle='--', alpha=0.75)
+          ax_hist.set_title('Combined RMSE Distribution of Forecasting Models')
+          ax_hist.set_xlabel('RMSE')
+          ax_hist.set_ylabel('Density')
+          ax_hist.set_xlim([global_rmse_min, global_rmse_max])
+          ax_hist.legend()
+          ax_hist.grid(axis='y', linestyle='--', alpha=0.75)
 
-      plt.tight_layout()
-      st.pyplot(fig_hist)
+          plt.tight_layout()
+          st.pyplot(fig_hist)
+      else:
+          st.warning("⚠️ RMSE data is empty. Cannot generate combined RMSE distribution plot.")
+
 
 with tab2:
 
@@ -279,10 +288,10 @@ with tab2:
       Stat_container = st.container(border=True)
       Graph_container = st.container(border=True)
       BASELINE_Container = st.container(border=True)
-      ARIMA_container = st.container(border=True)
+      ARIMA_container = st.container(border = True)
       ETS_container = st.container(border=True)
-      HW_Container = st.container(border=True)
-      HYBRID_Container = st.container(border=True)
+      HW_Container = st.container(border = True)
+      HYBRID_Container = st.container(border = True)
 
 
       with Stat_container:
@@ -329,26 +338,41 @@ with tab2:
           st.subheader('Hybrid Analysis')
           st.write(hybrid_result[hybrid_result['Item'] == selected_prod])
 
-      # Add download button
-      if selected_prod != '':
-        # Combine all dataframes for the selected product into a single dataframe for download
-        download_df = pd.concat([
-            time_series_analysis_result[time_series_analysis_result['Item'] == selected_prod].assign(Source='TimeSeriesAnalysis'),
-            combined_result[combined_result['Item'] == selected_prod].assign(Source='CombinedForecasts'),
-            baseline_result[baseline_result['Item'] == selected_prod].assign(Source='Baseline'),
-            auto_arima_result[auto_arima_result['Item'] == selected_prod].assign(Source='ARIMA'),
-            ets_result[ets_result['Item'] == selected_prod].assign(Source='ETS'),
-            holt_winters_result[holt_winters_result['Item'] == selected_prod].assign(Source='HoltWinters'),
-            hybrid_result[hybrid_result['Item'] == selected_prod].assign(Source='Hybrid')
-        ], ignore_index=True)
 
-        csv = download_df.to_csv(index=False).encode('utf-8')
-        st.download_button(
-            label="Download Data for Selected Item as CSV",
-            data=csv,
-            file_name=f'{selected_prod}_forecast_data.csv',
-            mime='text/csv',
-        )
+      # Add download buttons
+      if selected_prod != '':
+          # Combined download button (existing)
+          download_df_combined = pd.concat([
+              time_series_analysis_result[time_series_analysis_result['Item'] == selected_prod].assign(Source='TimeSeriesAnalysis'),
+              combined_result[combined_result['Item'] == selected_prod].assign(Source='CombinedForecasts'),
+              baseline_result[baseline_result['Item'] == selected_prod].assign(Source='Baseline'),
+              auto_arima_result[auto_arima_result['Item'] == selected_prod].assign(Source='ARIMA'),
+              ets_result[ets_result['Item'] == selected_prod].assign(Source='ETS'),
+              holt_winters_result[holt_winters_result['Item'] == selected_prod].assign(Source='HoltWinters'),
+              hybrid_result[hybrid_result['Item'] == selected_prod].assign(Source='Hybrid')
+          ], ignore_index=True)
+
+          csv_combined = download_df_combined.to_csv(index=False).encode('utf-8')
+          st.download_button(
+              label="Download All Data for Selected Item as CSV",
+              data=csv_combined,
+              file_name=f'{selected_prod}_all_forecast_data.csv',
+              mime='text/csv',
+          )
+
+          # New download button for combined_result
+          download_df_combined_only = combined_result[combined_result['Item'] == selected_prod]
+          if not download_df_combined_only.empty:
+              csv_combined_only = download_df_combined_only.to_csv(index=False).encode('utf-8')
+              st.download_button(
+                  label="Download Combined Forecast Data for Selected Item as CSV",
+                  data=csv_combined_only,
+                  file_name=f'{selected_prod}_combined_forecast_data.csv',
+                  mime='text/csv',
+              )
+          else:
+              st.warning(f"⚠️ No combined forecast data available for {selected_prod} to download.")
+
 
   else:
       st.warning("Could not load the necessary data to run the application.")
@@ -365,19 +389,22 @@ with tab3:
   Below is what you can expect to find in each tab:
 
   - **Forecast Model Summary**
-    - Performance metrics analysis - Review RMSE, SMAPE, MAE and Duration between the three models
-    - Distribution of RMSE (HW), SMAPE (HW), MAE (HW), and Duration (HW)
-    - Distribution of RMSE (ARIMA), SMAPE (ARIMA), MAE (ARIMA), and Duration (ARIMA)
-    - Distribution of RMSE (ETS), SMAPE (ETS), MAE (ETS), and Duration (ETS)
+    - Algorithm summary
+    - Number of items per best model by metric
+    - SHAP for XGBoost process
+    - Combined RMSE Distribution
 
   - **Individual Items Forecast**
     - Please select an Item from the dropdown list:
-    - Item test for trend and seasonality
-    - Performance Analysis
-    - Time Series Analysis with forecast
-    - ARIMA Analysis
-    - ETS Analysis
-    - Holt Winters Analysis
+      - Item test for trend and seasonality
+      - Time Series Analysis with forecast
+      - Baseline Analysis
+      - ARIMA Analysis
+      - ETS Analysis
+      - Holt Winters Analysis
+      - Hybrid Analysis
+      - Download Model parameters for Selected Item as CSV
+      - Download Forecast Data for Selected Item as CSV
 
   - **Help**
     - Information about the application design concept and background
