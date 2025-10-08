@@ -5,6 +5,7 @@ import numpy as np
 import streamlit as st
 import warnings
 import io # Import the io module
+import shap
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -120,6 +121,7 @@ with tab1:
   # Initialization. For each Container to be used
   Metric_container = st.container(border = True)
   Best_container = st.container(border = True)
+  SHAP_container = st.container(border = True)
   RMSE_Container = st.container(border = True)
 
   rmse_data = pd.DataFrame({
@@ -202,6 +204,9 @@ with tab1:
 
     with Best_container:
 
+      st.subheader('Number of items per best model by metric')
+      st.write('From each metric, the best model identifed by each item, and count of the item. To consider the best preferred model.')
+
       metrics = ['RMSE','SMAPE','MAE']
       counts_cols = [f'Count_Lowest_{metric}' for metric in metrics]
 
@@ -215,7 +220,20 @@ with tab1:
           axes_best[i].grid(axis='x', alpha=0.75)
 
       plt.tight_layout()
-      plt.show()
+      st.pyplot(fig_best)
+    
+    with SHAP_container:
+
+      st.subhearder('SHAP for XGBoost process')
+      st.write('For the Hybrid model - XGBoost process, to evalulate each factor effectiveness as a predictor')
+
+      feature_names = ['month', 'year', 'lag_1_qty', 'rolling_3m_avg_qty', 'Promo']
+      shap_values = shap_values_result[feature_names].values
+      X_values = shap_values_result[feature_names]
+
+      fig_shap, ax_shap = plt.subplots()
+      shap.summary_plot(shap_values, X_values , feature_names=feature_names)
+      st.pyplot(fig_shap)
 
     with RMSE_Container:
 
