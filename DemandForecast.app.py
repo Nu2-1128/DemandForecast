@@ -344,7 +344,7 @@ with tab2:
           # Combined download button (existing)
           download_df_combined = pd.concat([
               time_series_analysis_result[time_series_analysis_result['Item'] == selected_prod].assign(Source='TimeSeriesAnalysis'),
-              combined_result[combined_result['Item'] == selected_prod].assign(Source='CombinedForecasts'),
+              #combined_result[combined_result['Item'] == selected_prod].assign(Source='CombinedForecasts'),
               baseline_result[baseline_result['Item'] == selected_prod].assign(Source='Baseline'),
               auto_arima_result[auto_arima_result['Item'] == selected_prod].assign(Source='ARIMA'),
               ets_result[ets_result['Item'] == selected_prod].assign(Source='ETS'),
