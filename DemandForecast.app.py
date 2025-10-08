@@ -117,7 +117,7 @@ with tab1:
 
   # Initialization. For each Container to be used
   Metric_container = st.container(border = True)
-  best_model_container = st.container(boarder = True)
+  best_model_container = st.container(border = True)
   RMSE_Container = st.container(border = True)
 
   rmse_data = pd.DataFrame({
