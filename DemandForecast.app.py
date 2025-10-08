@@ -30,7 +30,7 @@ public_csv_ids ={
     'company_data': '1bHd4Rc3t6lPLM2OY931RoTJmMHQF-Hmu',
     'ets_results': '1hk1unwWuPYwhjLH6dDvyPd5wUxLvi_rJ',
     'holt_winters_results': '1XIoeToA9JaPg_Z8Fo5i2d17DF0R3nBcK',
-    'hybrid_df': '1J2YUWbCsBwi-POwdDqu7CId8Zpf2E6ST', 
+    'hybrid_df': '1J2YUWbCsBwi-POwdDqu7CId8Zpf2E6ST',
     'selected_items_df': '10rumhJAe93ThQxgpLPEY6Y1SsD_yy7G3',
     'shap_values_df': '10xbgC0M3iNDUEnfbyxQaa32aOiQ8OR95',
     'time_series_analysis_df': '1whpsUs-3ULPsg8WnlT1vMBvL99uTtHZo',
@@ -117,6 +117,7 @@ with tab1:
 
   # Initialization. For each Container to be used
   Metric_container = st.container(border = True)
+  best_model_container = st.container(boarder = True)
   RMSE_Container = st.container(border = True)
 
   rmse_data = pd.DataFrame({
@@ -150,6 +151,25 @@ with tab1:
       'Hybrid': hybrid_result['Duration'],
       'Baseline': baseline_result['Duration']
   })
+
+  best_model_by_rmse = combined_result.loc[combined_result.groupby('Item')['RMSE'].idxmin()]['Item','Series_Type','RMSE']
+  best_model_by_smape = combined_result.loc[combined_result.groupby('Item')['SMAPE'].idxmin()]['Item','Series_Type','SMAPE']
+  best_model_by_mae = combined_result.loc[combined_result.groupby('Item')['MAE'].idxmin()]['Item','Series_Type','MAE']
+
+  rmse_best_model_counts = best_model_by_rmse['Series_Type'].value_counts().reset_index()
+  smape_best_model_counts = best_model_by_smape['Series_Type'].value_counts().reset_index()
+  mae_best_model_counts = best_model_by_mae['Series_Type'].value_counts().reset_index()
+
+  combined_best_model_counts = pd.merge(rmse_best_model_counts, smape_best_model_counts, on='Series_Type', how='outer')
+  combined_best_model_counts = p.dmerge(combined_best_model_counts, mae_best_model_counts, on='Series_Type', how='outer')
+
+  combined_best_model_counts = combined_best_model_counts.fillna(0).asypte({'Count_Lowest_RMSE':int,'Count_Lowest,SMAPE':int,'Count_Lowest_MAE':int})
+  combined_best_model_counts['Rank_RMSE'] = combined_best_model_counts['Count_Lowest_RMSE'].rank(ascending=False, method='min').astype(int)
+  combined_best_model_counts['Rank_SMAPE'] = combined_best_model_counts['Count_Lowest_SMAPE'].rank(ascending=False, method='min').astype(int)
+  combined_best_model_counts['Rank_MAE'] = combined_best_model_counts['Count_Lowest_MAE'].rank(ascending=False, method='min').astype(int)
+
+  combined_best_model_counts['Total_Rank'] = combined_best_model_counts['Rank_RMSE'] + combined_best_model_counts['Rank_SMAPE'] + combined_best_model_counts['Rank_MAE']
+  combined_best_model_counts_ranked = combined_best_model_counts.sort_values(by='Total_Rank').reset_index(drop=True)
 
   if rmse_data.empty or smape_data.empty or mae_data.empty or duration_data.empty:
     st.warning("⚠️ One or more of the metric dataframes is empty. Cannot generate plots.")
@@ -196,6 +216,23 @@ with tab1:
       plt.tight_layout(rect=[0, 0.03, 1, 0.95]) # Adjust layout to prevent title overlap
 
       st.pyplot(fig)
+
+    with best_model_container:
+      
+      metrics = ['RMSE','SMAPE','MAE']
+      count_cols = [f'Count_Lowest_{metric}' for metric in metrics]
+
+      fig_best, axes_best = plt.subplots(1, len(metrics), figsize=(15, 5))
+      
+      for i, metric in enumerate(metrics):
+        sns.barplot(data=combined_best_model_counts_ranked, y='Series_type', x=f'Count_Lowest_{metric}', ax=axes_best[i], palette='viridis_r')
+        axes_best[i].set_title(f'Number of Items by {metric} for best model')
+        axes_best[i].set_xlabel('Number of Items')
+        axes_best[i].set_ylabel('Model Type')
+        axes_best[i].grid(axis='x', linestyle='--', alpha=0.75)
+
+      plt.tight_layout()
+      st.pyplot(fig_best)
 
     with RMSE_Container:
 
