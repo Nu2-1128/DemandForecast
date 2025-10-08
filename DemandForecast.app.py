@@ -34,7 +34,8 @@ public_csv_ids ={
     'selected_items_df': '10rumhJAe93ThQxgpLPEY6Y1SsD_yy7G3',
     'shap_values_df': '10xbgC0M3iNDUEnfbyxQaa32aOiQ8OR95',
     'time_series_analysis_df': '1whpsUs-3ULPsg8WnlT1vMBvL99uTtHZo',
-    'truncated_company_data': '1cFkzpSSqAeb81mYusNSHWtgPBWzBo67E'
+    'truncated_company_data': '1cFkzpSSqAeb81mYusNSHWtgPBWzBo67E',
+    'best_model': '1rCKQ2FBWVkw_zyhF_8T5jn27k_D8F5cu'
 }
 
 # Function to download file from Google Drive
@@ -105,6 +106,7 @@ selected_items_df = get_DataFrame_from_File('selected_items_df')
 shap_values_result = get_DataFrame_from_File('shap_values_df')
 time_series_analysis_result = get_DataFrame_from_File('time_series_analysis_df')
 truncated_company_data = get_DataFrame_from_File('truncated_company_data')
+best_model = get_DataFrame_from_File('best_model')
 
 # setup tabs name
 tab_titles = ['Forecast Model Summary','Individual Items Forecast','Help']
@@ -117,6 +119,7 @@ with tab1:
 
   # Initialization. For each Container to be used
   Metric_container = st.container(border = True)
+  Best_container = st.container(border = True)
   RMSE_Container = st.container(border = True)
 
   rmse_data = pd.DataFrame({
@@ -196,6 +199,23 @@ with tab1:
       plt.tight_layout(rect=[0, 0.03, 1, 0.95]) # Adjust layout to prevent title overlap
 
       st.pyplot(fig)
+
+    with Best_container:
+
+      metrics = ['RMSE','SMAPE','MAE']
+      counts_cols = [f'Count_Lowest_{metric}' for metric in metrics]
+
+      fig_best, axes_best = plt.subplots(1, len(metrics), figsize=(15, 6))
+
+      for i, metric in enumerate(metrics):
+          sns.barplot(data=best_model, y='Series_Type', x=f'Count_Lowest_{metric}', ax=axes_best[i], palette='viridis_r') # Changed palette to viridis_r for reversed colors
+          axes_best[i].set_title(f'Number of Items by {metric} for best model')
+          axes_best[i].set_xlabel('Number of Items')
+          axes_best[i].set_ylabel('Model Type')
+          axes_best[i].grid(axis='x', alpha=0.75)
+
+      plt.tight_layout()
+      plt.show()
 
     with RMSE_Container:
 
