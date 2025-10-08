@@ -224,7 +224,7 @@ with tab1:
     
     with SHAP_container:
 
-      st.subhearder('SHAP for XGBoost process')
+      st.subheader('SHAP for XGBoost process')
       st.write('For the Hybrid model - XGBoost process, to evalulate each factor effectiveness as a predictor')
 
       feature_names = ['month', 'year', 'lag_1_qty', 'rolling_3m_avg_qty', 'Promo']
