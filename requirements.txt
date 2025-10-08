@@ -10,6 +10,7 @@ matplotlib-venn==1.1.2
 requests-cache==1.2.1
 plotly==5.24.1
 seaborn==0.13.2
+shap
 google-cloud-aiplatform
 google-cloud-logging
 google-api-python-client
